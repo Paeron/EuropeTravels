@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Europe Travels</title>
+        <script type="text/javascript" src="d3/d3.v3.js"></script>
+        <script type="text/javascript" src="js/topojson.min.js"></script>
+        <script type="text/javascript" src="js/datamaps.world.hires.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+        body {
+          background-color: #80aec5;
+          font-family: Helvetica;
+        }
+          #map {
+            position: relative;
+            margin: auto;
+            height: 500px;
+            border: 3px solid white;
+          }
+          #notmap {
+            padding: 10px;
+            position: relative;
+            margin: auto;
+            height: 500px;
+            border: 3px solid white;
+            display: block;
+          }
+          h1 {
+            color: white;
+            position: relative;
+            margin: auto;
+            text-align: center;
+            padding: 10px;
+            font-size: 40px;
+          }
+          h2, h4 {
+            padding: 10px;
+            color: white;
+            margin: auto;
+            text-align: center;
+          }
+          img {
+            display: block;
+            margin: auto;
+            position: relative;
+            text-align: center;
+            max-width: 75%;
+            max-height: 75%;
+            box-shadow: 8px 8px 10px #aaa;
+          }
+          i:hover {
+            opacity: 0.5;
+          }
+          a {
+            color: white;
+          }
+          .hoverinfo {
+            font-weight: bold;
+          }
+          @media screen and (max-width: 480px) {
+            #map {
+              height: 500px;
+            }
+            #notmap {
+              height: 500px;
+            }
+          }
+          .cool {
+            text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+          }
+        </style>
+    </head>
+    <body>
+
+      <div class="container-fluid">
+        <div class="row">
+          <h1>Europe Travels <a href="https://github.com/Paeron/EuropeTravels"><i class="fa fa-github"></i></a> Since 2017</h1>
+          <div class="col-sm-6">
+            <div id="map"></div>
+          </div>
+
+          <div class="col-sm-6">
+            <div id="notmap">
+              <h2 id="text"><br>Move the mouse over the map to explore my travel destinations. If you are on a phone or tabled you have to click. <br><br>The countries in <span class="cool" style="color: #142a06">green</span> are countries I visited, the <span style="color: #dbdcde" class="cool">circles</span> are the locations I went too.</h2>
+              <img id="image"/>
+              <h4 id="info"></h4>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+<script>
+  var setRadius = 7;
+  var opacity = 0.6;
+  var map = new Datamap({
+    element: document.getElementById("map"),
+    setProjection: function(element) {
+      var projection = d3.geo.equirectangular()
+        .center([11.0, 52.5])
+        .rotate([0, 0])
+        .scale(750)
+        .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+      var path = d3.geo.path()
+        .projection(projection);
+      return {path: path, projection: projection};
+    },
+    responsive: true,
+    fills: {
+      defaultFill: "#4d704f",
+      authorHasTraveledTo: "#142a06",
+      Singapore: "#739814",
+      travel: "#dbdcde",
+    },
+    geographyConfig: {
+      highlightFillColor: '#aaa',
+      highlightBorderColor: '#rgba(1,1,1,0.5)',
+      highlightBorderWidth: 1,
+      popupTemplate: function(geography, data) {
+        document.getElementById("text").innerHTML = geography.properties.name;
+        if (countrydata.data[geography.properties.name] != undefined){
+          document.getElementById("info").innerHTML = countrydata.data[geography.properties.name];
+        }
+        else {
+          document.getElementById("info").innerHTML = "";
+        }
+        
+        var image =  document.getElementById("image");
+        image.src = "images/"+geography.properties.name+".jpg";
+        image.style.display='block';
+        return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
+      }
+    },
+    bubblesConfig: {
+      highlightFillColor: '#444',
+      highlightBorderColor: '#rgba(1,1,1,0.5)',
+      highlightBorderWidth: 2,
+    },
+    data: {
+      FIN: { fillKey: "authorHasTraveledTo" },
+      SWE: { fillKey: "authorHasTraveledTo" },
+      PRT: { fillKey: "authorHasTraveledTo" },
+      FRA: { fillKey: "authorHasTraveledTo" },
+      BEL: { fillKey: "authorHasTraveledTo" },
+      NLD: { fillKey: "authorHasTraveledTo" },
+    }
+  });
+
+  map.bubbles([
+    {
+      name: 'Stockholm',
+      radius: 10,
+      latitude: 59.3, longitude: 18.1,
+      fillKey: 'Singapore',
+      im: 'sto',
+      fillOpacity: 0.8,
+      text: "Live here. <3",
+    },
+    {
+      name: 'Fränsta',
+      radius: setRadius,
+      latitude: 62.5, longitude: 16.1,
+      fillKey: 'travel',
+      im: 'fraa',
+      fillOpacity: opacity,
+      text: "Stayed at my parents' friends' place for one night.",
+    },
+    {
+      name: 'Aavasaksa',
+      radius: setRadius,
+      latitude: 66.4, longitude: 24.5,
+      fillKey: 'travel',
+      im: 'aav',
+      fillOpacity: opacity,
+      text: "Went here on a day trip. Went to the Tsar's summer house (altough he never went there himself).",
+    },
+    {
+      name: 'Torneo',
+      radius: setRadius,
+      latitude: 66.3, longitude: 23.4,
+      fillKey: 'travel',
+      im: 'tor',
+      fillOpacity: opacity,
+      text: 'Spend maybe 10 days here. Beautiful nature, had bad luck with the weather.',
+    },
+    {
+      name: 'Umeå',
+      radius: setRadius,
+      latitude: 63.8, longitude: 20.1,
+      fillKey: 'travel',
+      im: 'ume',
+      fillOpacity: opacity,
+      text: "Went here to visiy a friend, it was very cold in June there was still tiny amounts of snow left.",
+    },
+    {
+      name: 'Småland',
+      radius: setRadius,
+      latitude: 57.8, longitude: 14.6,
+      fillKey: 'travel',
+      im: 'sma',
+      fillOpacity: opacity,
+      text: "Visited relatives here during the summer.",
+    },
+    {
+      name: 'Kammartäppan',
+      radius: setRadius,
+      latitude: 58.8, longitude: 16.2,
+      fillKey: 'travel',
+      im: 'kam',
+      fillOpacity: opacity,
+      text: "Celebrated Midsummer, one of the largest public holidays in Sweden.",
+    },
+    {
+      name: 'Faro',
+      radius: setRadius,
+      latitude: 37, longitude: -8,
+      fillKey: 'travel',
+      im: 'far',
+      fillOpacity: opacity,
+      text: "My first stop in Portugal. Was very warm and the place was not as I imagined, had a good time and learned lots about myself.",
+    },
+    {
+      name: 'Fuseta',
+      radius: setRadius,
+      latitude: 37, longitude: -7,
+      fillKey: 'travel',
+      im: 'fus',
+      fillOpacity: opacity,
+      text: "Got the advice from a guy at my hostel in Faro to go here, went to an enourmous beach, very beautiful",
+    },
+    {
+      name: 'Olhão',
+      radius: setRadius,
+      latitude: 38, longitude: -7.5,
+      fillKey: 'travel',
+      im: 'olh',
+      fillOpacity: opacity,
+      text: "Went here on a daytrip, very small town.",
+    },
+    {
+      name: 'Portimão',
+      radius: setRadius,
+      latitude: 37, longitude: -9,
+      fillKey: 'travel',
+      im: 'porti',
+      fillOpacity: opacity,
+      text: "Saw really beautiful rocks at the beaches here. Glad I went here.",
+    },
+    {
+      name: 'Lisbon',
+      radius: setRadius,
+      latitude: 38.7, longitude: -9.2,
+      fillKey: 'travel',
+      im: 'lis',
+      fillOpacity: opacity,
+      text: "The capital of Portugal, my favourite moments were to visit Alfama and going to different viewpoints to see the city, had food poisoning while being here so did't do to much there.",
+    },
+    {
+      name: 'Porto',
+      radius: setRadius,
+      latitude: 41.3, longitude: -8.5,
+      fillKey: 'travel',
+      im: 'porto',
+      fillOpacity: opacity,
+      text: "Historical city with many chuches, museums and beautiful streets.",
+    },
+    {
+      name: 'Vila Nova de Gaia',
+      radius: setRadius,
+      latitude: 40.2, longitude: -8.6,
+      fillKey: 'travel',
+      im: 'vil',
+      fillOpacity: opacity,
+      text: "A city on the other side of the river Duoro from Porto, this is where all the Port Wine actually comes from.",
+    },
+    {
+      name: 'Paris',
+      radius: setRadius,
+      latitude: 48.8, longitude: 2.4,
+      fillKey: 'travel',
+      im: 'par',
+      fillOpacity: opacity,
+      text: "Capital of France, very tourtisy, had some bad luck with the weather but there were many beautiful things to see.",
+    },
+    {
+      name: 'Mareil-Marly',
+      radius: setRadius,
+      latitude: 48.8, longitude: 1.3,
+      fillKey: 'travel',
+      im: 'mar',
+      fillOpacity: opacity,
+      text: "A small city/suburb outside Paris where I was staying, many small pretty houses and pear trees.",
+    },
+    {
+      name: 'Bruges',
+      radius: setRadius,
+      latitude: 50.8, longitude: 3.2,
+      fillKey: 'travel',
+      im: 'bru',
+      fillOpacity: opacity,
+      text: "Beautiful old city with many beautiful canals and cool houses. Many tourists. Sort of wish I lived here.",
+    },
+    {
+      name: 'Antwerp',
+      radius: setRadius,
+      latitude: 50.9, longitude: 4.4,
+      fillKey: 'travel',
+      im: 'ant',
+      fillOpacity: opacity,
+      text: "Went here during a day trip from Eindhoven.",
+    },
+    {
+      name: 'Eindhoven',
+      radius: setRadius,
+      latitude: 51.0, longitude: 5.6,
+      fillKey: 'travel',
+      im: 'ein',
+      fillOpacity: opacity,
+      text: "Stayed here with a friend. Cute streets, many shops, cool old factories that are now hipster cafées and allegedly the largest party steet in Europe (or the world?).",
+    },
+    {
+      name: "'s-Hertogenbosch",
+      radius: setRadius,
+      latitude: 52.1, longitude: 6.1,
+      fillKey: 'travel',
+      im: 'she',
+      fillOpacity: opacity,
+      text: "Went here during one afternoon, can't pronounce the name.",
+    },
+    {
+      name: 'Utrecht',
+      radius: setRadius,
+      latitude: 51.9, longitude: 5,
+      fillKey: 'travel',
+      im: 'utr',
+      fillOpacity: opacity,
+      text: "Spend a few hours here, has a nice canal and found a cool tunne with LED-lights.",
+    },
+    {
+      name: 'Den Haag',
+      radius: setRadius,
+      latitude: 51.9, longitude: 3.9,
+      fillKey: 'travel',
+      im: 'haa',
+      fillOpacity: opacity,
+      text: "Beautiful city, didn't spend too much time here but saw many beautiful houses, including the Parliament.",
+    },
+    {
+      name: 'Amsterdam',
+      radius: setRadius,
+      latitude: 52.9, longitude: 4.9,
+      fillKey: 'travel',
+      im: 'ams',
+      fillOpacity: opacity,
+      text: "What happens in Amsterdam stays in Amsterdam.",
+    }
+  ], {
+    popupTemplate: function(geo, data) {
+      if (data.text != null) {
+        document.getElementById("info").innerHTML = data.text;
+      }
+      else {
+        document.getElementById("info").innerHTML = "";
+      }
+      document.getElementById("image").src = "images/"+data.im+".jpg";
+      document.getElementById("image").style.display='block';
+      document.getElementById("text").innerHTML = data.name;
+    
+      return "<div class='hoverinfo'>" + data.name + "</div>"
+    }
+});
+
+window.addEventListener('resize', function() {
+        map.resize();
+    });
+
+document.addEventListener("DOMContentLoaded", function(event) {
+   document.querySelectorAll('img').forEach(function(img){
+    img.onerror = function(){this.style.display='none';};
+   })
+});
+
+var countrydata = {"data": {
+  "Sweden": "Home",
+}};
+      </script>
+    </body>
+</html> 
